@@ -4,9 +4,9 @@ import com.zerobase.recruitment.dto.RecruitmentDto;
 import com.zerobase.recruitment.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -20,4 +20,13 @@ public class RecruitmentController {
         recruitmentService.postingRecruitment(request);
     }
 
+    @GetMapping("/recruitments")
+    public List<RecruitmentDto.Response> getRecruitmentList() {
+        return recruitmentService.getRecruitments();
+    }
+
+    @GetMapping("/recruitments/{id}")
+    public RecruitmentDto.Response getRecruitment(@PathVariable(name = "id") Long recruitmentId) {
+        return recruitmentService.getRecruitment(recruitmentId);
+    }
 }

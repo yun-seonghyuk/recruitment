@@ -1,5 +1,6 @@
 package com.zerobase.recruitment.entity;
 
+import com.zerobase.recruitment.dto.RecruitmentDto;
 import com.zerobase.recruitment.enums.RecruitmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,5 +49,19 @@ public class Recruitment {
 
     public void opening(){
         this.status = RecruitmentStatus.OPEN;
+    }
+
+    public RecruitmentDto.Response toDto(){
+        return RecruitmentDto.Response.builder()
+                .recruitmentId(this.id)
+                .title(this.title)
+                .recruiterCount(this.recruiterCount)
+                .closingDate(this.closingDate)
+                .status(this.status)
+                .modifiedDate(this.modifyDate)
+                .postingDate(this.postingDate)
+                .companyMemberId(this.companyMember.getId())
+                .companyName(this.companyMember.getCompanyName())
+                .build();
     }
 }
