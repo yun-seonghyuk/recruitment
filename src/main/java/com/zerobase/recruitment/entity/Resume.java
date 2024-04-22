@@ -3,7 +3,9 @@ package com.zerobase.recruitment.entity;
 import com.zerobase.recruitment.enums.ResumeStatus;
 import com.zerobase.recruitment.utils.EducationListJsonConverter;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,6 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Resume {
 
     @Id
