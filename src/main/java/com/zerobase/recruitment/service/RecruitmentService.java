@@ -47,4 +47,18 @@ public class RecruitmentService {
         return recruitmentRepository.findById(id).orElseThrow(
                 ()-> new RuntimeException("해당하는 공고 없음")).toDto();
     }
+
+    @Transactional
+    public RecruitmentDto.Response modifyRecruitment(Long recruitmentId, RecruitmentDto.Request request) {
+        // todo 이 공고의 진짜 주인인지?
+        Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
+                .orElseThrow(() -> new RuntimeException("해당하는 공고 없음"));
+
+        if(!recruitment.getCompanyMember().getLoginId().equals(request.companyMemberId())){
+            throw new RuntimeException("잘못된 기업회원 정보 입니다.");
+        }
+
+        // todo 맞으면 업데이트
+        return recruitment.update(request).toDto();
+    }
 }

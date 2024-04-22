@@ -29,4 +29,12 @@ public class RecruitmentController {
     public RecruitmentDto.Response getRecruitment(@PathVariable(name = "id") Long recruitmentId) {
         return recruitmentService.getRecruitment(recruitmentId);
     }
+
+    @PutMapping("/recruitments/{id}")
+    public RecruitmentDto.Response modifyRecruitment(
+            @PathVariable(name = "id") Long recruitmentId,
+            @RequestBody RecruitmentDto.Request request
+    ) {
+            return recruitmentService.modifyRecruitment(recruitmentId, request);
+    }
 }

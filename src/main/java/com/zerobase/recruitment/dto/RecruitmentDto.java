@@ -15,7 +15,8 @@ public class RecruitmentDto {
             Integer recruiterCount,
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
             LocalDateTime closingDate,
-            String companyMemberId
+            String companyMemberId,
+            RecruitmentStatus status
     ){
         public Recruitment toEntity(){
             return Recruitment.builder()
