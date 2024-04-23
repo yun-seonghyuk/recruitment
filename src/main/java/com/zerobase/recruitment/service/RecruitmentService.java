@@ -1,14 +1,18 @@
 package com.zerobase.recruitment.service;
 
+import com.zerobase.recruitment.dto.ApplicationDto;
 import com.zerobase.recruitment.dto.RecruitmentDto;
+import com.zerobase.recruitment.entity.Application;
 import com.zerobase.recruitment.entity.CompanyMember;
 import com.zerobase.recruitment.entity.Recruitment;
+import com.zerobase.recruitment.entity.Resume;
+import com.zerobase.recruitment.enums.ApplicationStatus;
 import com.zerobase.recruitment.enums.RecruitmentStatus;
+import com.zerobase.recruitment.repository.ApplicationRepository;
 import com.zerobase.recruitment.repository.CompanyMemberRepository;
 import com.zerobase.recruitment.repository.RecruitmentRepository;
+import com.zerobase.recruitment.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +22,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecruitmentService {
 
-    private static final Logger log = LoggerFactory.getLogger(RecruitmentService.class);
     private final RecruitmentRepository recruitmentRepository;
     private final CompanyMemberRepository companyMemberRepository;
+    private final ResumeRepository resumeRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Transactional
     public void postingRecruitment(RecruitmentDto.Request request) {
         // todo 이 회원이 기업회원인지 검증 필요
-        CompanyMember companyMember =  companyMemberRepository.findByLoginId(request.companyMemberId())
-                .orElseThrow(()-> new RuntimeException("기업 회원 정보 없음"));
+        CompanyMember companyMember = companyMemberRepository.findByLoginId(request.companyMemberId())
+                .orElseThrow(() -> new RuntimeException("기업 회원 정보 없음"));
 
         // todo 공고를 등록
         Recruitment recruitment = request.toEntity();
@@ -45,7 +50,7 @@ public class RecruitmentService {
     @Transactional(readOnly = true)
     public RecruitmentDto.Response getRecruitment(Long id) {
         return recruitmentRepository.findById(id).orElseThrow(
-                ()-> new RuntimeException("해당하는 공고 없음")).toDto();
+                () -> new RuntimeException("해당하는 공고 없음")).toDto();
     }
 
     @Transactional
@@ -54,7 +59,7 @@ public class RecruitmentService {
         Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
                 .orElseThrow(() -> new RuntimeException("해당하는 공고 없음"));
 
-        if(!recruitment.getCompanyMember().getLoginId().equals(request.companyMemberId())){
+        if (!recruitment.getCompanyMember().getLoginId().equals(request.companyMemberId())) {
             throw new RuntimeException("잘못된 기업회원 정보 입니다.");
         }
 
@@ -67,10 +72,29 @@ public class RecruitmentService {
         Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
                 .orElseThrow(() -> new RuntimeException("해당하는 공고 없음"));
 
-        if(!recruitment.getCompanyMember().getLoginId().equals(request.companyMemberId())){
+        if (!recruitment.getCompanyMember().getLoginId().equals(request.companyMemberId())) {
             throw new RuntimeException("잘못된 기업회원 정보 입니다.");
         }
 
         recruitmentRepository.deleteById(recruitmentId);
+    }
+
+    @Transactional
+    public void applyRecruitment(Long recruitmentId, ApplicationDto.Request request) {
+        // todo 개인 회원이면서 valid 한 이력서 정보이다.
+        Resume resume = resumeRepository.findByIdAndMemberId(request.resumeId(), request.memberId())
+                .orElseThrow(() -> new RuntimeException("이력서 정보를 찾을 수 없습니다."));
+
+        //todo 존재하는 공고여야 한다!
+        Recruitment recruitment = recruitmentRepository.findByIdAndStatus(recruitmentId, RecruitmentStatus.OPEN)
+                .orElseThrow(() -> new RuntimeException("해당하는 공고 없음"));
+
+        Application application = Application.builder()
+                .recruitment(recruitment)
+                .resume(resume)
+                .status(ApplicationStatus.APPLY_FINISHED)
+                .build();
+
+        applicationRepository.save(application);
     }
 }

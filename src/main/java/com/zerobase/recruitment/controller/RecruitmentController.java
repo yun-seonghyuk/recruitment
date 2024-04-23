@@ -1,5 +1,6 @@
 package com.zerobase.recruitment.controller;
 
+import com.zerobase.recruitment.dto.ApplicationDto;
 import com.zerobase.recruitment.dto.RecruitmentDto;
 import com.zerobase.recruitment.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
@@ -45,4 +46,13 @@ public class RecruitmentController {
     {
         recruitmentService.deleteRecruitment(recruitmentId, request);
     }
+
+    @PostMapping("/recruitments/{id}")
+    public void applyRecruitment(
+            @PathVariable(name = "id") Long recruitmentId,
+            @RequestBody ApplicationDto.Request request)
+    {
+        recruitmentService.applyRecruitment(recruitmentId, request);
+    }
+
 }

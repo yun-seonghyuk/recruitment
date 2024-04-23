@@ -9,6 +9,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/*
+* 공고 entity
+* */
 @Entity
 @Getter
 @Setter

@@ -1,14 +1,15 @@
 package com.zerobase.recruitment.entity;
 
+import com.zerobase.recruitment.enums.ApplicationStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+/*
+* 지원하기 entity
+* */
 @Entity
 @Getter
 @Setter
@@ -20,7 +21,8 @@ public class Application {
     @Column(name = "application_id")
     private Long id;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus status;
 
     @CreationTimestamp
     private LocalDateTime applicationDate;
@@ -32,4 +34,15 @@ public class Application {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
     private Resume resume;
+
+    @Builder
+    Application(
+            Resume resume,
+            Recruitment recruitment,
+            ApplicationStatus status
+    ){
+        this.recruitment = recruitment;
+        this.resume = resume;
+        this.status = status;
+    }
 }
