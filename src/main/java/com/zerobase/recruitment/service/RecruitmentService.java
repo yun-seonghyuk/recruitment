@@ -1,12 +1,11 @@
 package com.zerobase.recruitment.service;
 
+import com.zerobase.recruitment.dto.ApplicantInfo;
 import com.zerobase.recruitment.dto.ApplicationDto;
 import com.zerobase.recruitment.dto.RecruitmentDto;
-import com.zerobase.recruitment.entity.Application;
-import com.zerobase.recruitment.entity.CompanyMember;
-import com.zerobase.recruitment.entity.Recruitment;
-import com.zerobase.recruitment.entity.Resume;
+import com.zerobase.recruitment.entity.*;
 import com.zerobase.recruitment.enums.ApplicationStatus;
+import com.zerobase.recruitment.enums.EducationLevel;
 import com.zerobase.recruitment.enums.RecruitmentStatus;
 import com.zerobase.recruitment.repository.ApplicationRepository;
 import com.zerobase.recruitment.repository.CompanyMemberRepository;
@@ -16,7 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -115,5 +118,38 @@ public class RecruitmentService {
                 .resumeTitle(a.getResume().getTitle())
                 .educationList(a.getResume().getEducation())
                 .name(a.getResume().getMember().getName()).build()).toList();
+    }
+
+    @Transactional
+    public void finishRecruitment(Long recruitmentId, Long companyMemberId) {
+        // todo valid 한 공고 조회
+        Recruitment recruitment = recruitmentRepository
+                .findByIdAndStatusAndCompanyMemberId(recruitmentId, RecruitmentStatus.OPEN, companyMemberId)
+                .orElseThrow(()-> new RuntimeException("공고 정보 없음!!"));
+
+        // todo 공고 마감상태로 변경
+        recruitment.closing();
+
+        // todo 지원자 정보를 조회
+        List<Application> applicationList = recruitment.getApplicationList();
+
+        // todo 지원자 정보 가공 (스코어링 계산, 소팅)
+        List<ApplicantInfo> applicantInfoList = applicationList.stream().map(Application::getResume).map(r ->{
+            Education education = r.getEducation().stream().max(Comparator.comparing(Education::getDegree))
+                    .orElse(Education.builder().build());
+            return new ApplicantInfo(r.getId(), EducationLevel.findByCode(education.getCode()).getScore(education.getDegree()));
+        }).sorted(Comparator.comparing(ApplicantInfo::getScore).reversed()).toList();
+
+        Map<Long, Integer> applicantInfoMap = IntStream.range(0, applicantInfoList.size()).boxed()
+                .collect(Collectors.toMap(i -> applicantInfoList.get(i).getResumeId(), i -> i));
+
+        // todo 공고에 설정한 합격자 수 만큼 합격처리, 나머지는 불학격 처리
+        applicationList.forEach(application -> {
+            if (applicantInfoMap.get(application.getResume().getId()) < recruitment.getRecruiterCount()) {
+                application.pass();
+            } else {
+                application.fail();
+            }
+        });
     }
 }

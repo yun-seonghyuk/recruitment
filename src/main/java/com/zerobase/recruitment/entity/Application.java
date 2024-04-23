@@ -45,4 +45,12 @@ public class Application {
         this.resume = resume;
         this.status = status;
     }
+
+    public void pass(){
+        this.status = ApplicationStatus.PASS;
+    }
+
+    public void fail(){
+        this.status = ApplicationStatus.FAIL;
+    }
 }

@@ -1,6 +1,7 @@
 package com.zerobase.recruitment.controller;
 
 import com.zerobase.recruitment.dto.ApplicationDto;
+import com.zerobase.recruitment.dto.FinishedDto;
 import com.zerobase.recruitment.dto.RecruitmentDto;
 import com.zerobase.recruitment.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
@@ -63,4 +64,9 @@ public class RecruitmentController {
        return recruitmentService.getApplications(recruitmentId, companyMemberId);
     }
 
+    @PostMapping("/recruitments/{id}/finished")
+    public void finishRecruitment(@PathVariable(name = "id") Long recruitmentId,
+                                  @RequestBody FinishedDto request){
+        recruitmentService.finishRecruitment(recruitmentId, request.getCompanyMemberId());
+    }
 }

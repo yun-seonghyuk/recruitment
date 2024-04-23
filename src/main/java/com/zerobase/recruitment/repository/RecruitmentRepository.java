@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface RecruitmentRepository extends JpaRepository<Recruitment, Long> {
     List<Recruitment> findAllByStatus(RecruitmentStatus status);
     Optional<Recruitment> findByIdAndStatus(Long recruitmentId, RecruitmentStatus status);
+    Optional<Recruitment> findByIdAndStatusAndCompanyMemberId(Long recruitmentId, RecruitmentStatus status, Long companyMemberId);
 }

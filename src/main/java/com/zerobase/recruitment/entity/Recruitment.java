@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /*
 * 공고 entity
@@ -39,6 +40,10 @@ public class Recruitment {
     @JoinColumn(name = "company_member_id")
     private CompanyMember companyMember;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "recruitment")
+    private List<Application> applicationList;
+
+
     @Builder
     public Recruitment(
             String title,
@@ -52,6 +57,10 @@ public class Recruitment {
 
     public void opening(){
         this.status = RecruitmentStatus.OPEN;
+    }
+
+    public void closing(){
+        this.status = RecruitmentStatus.CLOSE;
     }
 
     public RecruitmentDto.Response toDto(){
