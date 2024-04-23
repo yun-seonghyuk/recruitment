@@ -97,4 +97,23 @@ public class RecruitmentService {
 
         applicationRepository.save(application);
     }
+
+    @Transactional(readOnly = true)
+    public List<ApplicationDto.Response> getApplications(Long recruitmentId, Long companyMemberId) {
+        // todo valid 한 기업회원 정보인가?
+        companyMemberRepository.findById(companyMemberId)
+                .orElseThrow(()-> new RuntimeException("조회 권한 없음!!"));
+
+        // todo 지원자들 정보 조회
+        List<Application> applicationList = applicationRepository.findAllByRecruitmentId(recruitmentId);
+
+        return applicationList.stream().map(a -> ApplicationDto.Response.builder()
+                .applicationId(a.getId())
+                .status(a.getStatus())
+                .applicationDate(a.getApplicationDate())
+                .resumeId(a.getResume().getId())
+                .resumeTitle(a.getResume().getTitle())
+                .educationList(a.getResume().getEducation())
+                .name(a.getResume().getMember().getName()).build()).toList();
+    }
 }

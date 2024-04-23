@@ -47,12 +47,20 @@ public class RecruitmentController {
         recruitmentService.deleteRecruitment(recruitmentId, request);
     }
 
-    @PostMapping("/recruitments/{id}")
+    @PostMapping("/recruitments/{id}/applications")
     public void applyRecruitment(
             @PathVariable(name = "id") Long recruitmentId,
             @RequestBody ApplicationDto.Request request)
     {
         recruitmentService.applyRecruitment(recruitmentId, request);
+    }
+
+    @GetMapping("/recruitments/{id}/applications")
+    public List<ApplicationDto.Response> getApplications(
+            @PathVariable(name = "id") Long recruitmentId,
+            @RequestParam(name = "companyMemberId") Long companyMemberId)
+    {
+       return recruitmentService.getApplications(recruitmentId, companyMemberId);
     }
 
 }
