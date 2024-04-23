@@ -1,5 +1,10 @@
 package com.zerobase.recruitment.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
 public class Education {
 
     private String school;
